@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>D&D Central</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Roboto&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{margin:0;background:#0f0f17;color:white;font-family:Roboto;}
+header{background:linear-gradient(90deg,#5a2aa6,#8b3fff);padding:20px;text-align:center;font-family:Cinzel;font-size:32px;}
+.card{background:#1b1b29;padding:20px;margin:20px;border-radius:10px;}
+button{background:#8b3fff;border:none;padding:10px;color:white;border-radius:8px;cursor:pointer;}
+input,textarea{padding:8px;margin:5px;border-radius:6px;border:none;}
+img{max-width:120px;border-radius:8px;margin-top:10px;}
+</style>
+
+</head>
+
+<body>
+
+<header>D&D CENTRAL 🐉</header>
+
+<div class="card">
+
+<h2>Account</h2>
+
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+
+<br>
+
+<button onclick="signup()">Sign Up</button>
+<button onclick="login()">Login</button>
+<button onclick="logout()">Logout</button>
+
+<p id="status"></p>
+
+</div>
+
+<div class="card">
+
+<h2>Character Creator</h2>
+
+<input id="charName" placeholder="Character Name">
+<input type="file" id="charImage">
+
+<br>
+
+<button onclick="saveChar()">Save Character</button>
+<button onclick="loadChars()">Load Characters</button>
+
+<div id="charList"></div>
+
+</div>
+
+<div class="card">
+
+<h2>Campaign Creator</h2>
+
+<input id="campName" placeholder="Campaign Name">
+<textarea id="campNotes" placeholder="Notes"></textarea>
+<input type="file" id="campImage">
+
+<br>
+
+<button onclick="saveCamp()">Save Campaign</button>
+<button onclick="loadCamps()">Load Campaigns</button>
+
+<div id="campList"></div>
+
+</div>
+
+<script>
+
+const supabase = window.supabase.createClient(
+"YOUR_URL",
+"YOUR_KEY"
+)
+
+let user = null
+
+// AUTH
+
+async function signup(){
+await supabase.auth.signUp({
+email: email.value,
+password: password.value
+})
+alert("Signed up!")
+}
+
+async function login(){
+let { data } = await supabase.auth.signInWithPassword({
+email: email.value,
+password: password.value
+})
+user = data.user
+status.innerText = "Logged in as " + user.email
+}
+
+async function logout(){
+await supabase.auth.signOut()
+user = null
+status.innerText = "Logged out"
+}
+
+// IMAGE UPLOAD
+
+async function upload(file, path){
+const { error } = await supabase.storage
+.from('images')
+.upload(path, file)
+
+if(error){
+alert(error.message)
+return null
+}
+
+return supabase.storage
+.from('images')
+.getPublicUrl(path).data.publicUrl
+}
+
+// CHARACTER
+
+async function saveChar(){
+
+if(!user){alert("Login first");return}
+
+let file = charImage.files[0]
+if(!file){alert("Pick image");return}
+
+let url = await upload(file, user.id + "/char_" + file.name)
+
+await supabase.from("characters").insert({
+user_id: user.id,
+name: charName.value,
+image: url
+})
+
+alert("Character saved!")
+}
+
+async function loadChars(){
+
+if(!user){alert("Login first");return}
+
+charList.innerHTML=""
+
+let { data } = await supabase
+.from("characters")
+.select("*")
+.eq("user_id", user.id)
+
+data.forEach(c=>{
+charList.innerHTML += `
+<div>
+<h3>${c.name}</h3>
+<img src="${c.image}">
+</div>
+`
+})
+
+}
+
+// CAMPAIGNS
+
+async function saveCamp(){
+
+if(!user){alert("Login first");return}
+
+let file = campImage.files[0]
+if(!file){alert("Pick image");return}
+
+let url = await upload(file, user.id + "/camp_" + file.name)
+
+await supabase.from("campaigns").insert({
+user_id: user.id,
+name: campName.value,
+notes: campNotes.value,
+image: url
+})
+
+alert("Campaign saved!")
+}
+
+async function loadCamps(){
+
+if(!user){alert("Login first");return}
+
+campList.innerHTML=""
+
+let { data } = await supabase
+.from("campaigns")
+.select("*")
+.eq("user_id", user.id)
+
+data.forEach(c=>{
+campList.innerHTML += `
+<div>
+<h3>${c.name}</h3>
+<p>${c.notes}</p>
+<img src="${c.image}">
+</div>
+`
+})
+
+}
+
+</script>
+
+</body>
+</html>
