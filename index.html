@@ -10,7 +10,7 @@
 <style>
 body{margin:0;font-family:Roboto;background:#0d0d15;color:white;}
 header{background:linear-gradient(90deg,#5a2aa6,#8b3fff);padding:20px;text-align:center;font-family:Cinzel;font-size:32px;}
-nav{display:flex;justify-content:center;background:#1b1b29;}
+nav{display:flex;justify-content:center;background:#1b1b29;position:sticky;top:0;z-index:100;}
 nav button{background:none;color:white;border:none;padding:15px 20px;cursor:pointer;font-size:16px;}
 nav button:hover{background:#3a3a60;border-radius:6px;}
 .tab{display:none;padding:20px;}
@@ -32,7 +32,7 @@ h2{margin-top:0;}
 </nav>
 
 <!-- D&D TAB -->
-<div id="dnd" class="tab">
+<div id="dnd" class="tab" style="display:block">
 
 <div class="card">
 <h2>Account</h2>
@@ -117,11 +117,9 @@ h2{margin-top:0;}
 <script>
 // ------------------ TAB NAVIGATION ------------------
 function showTab(tabId){
-document.querySelectorAll('.tab').forEach(t=>t.style.display='none');
-document.getElementById(tabId).style.display='block';
+  document.querySelectorAll('.tab').forEach(t=>t.style.display='none');
+  document.getElementById(tabId).style.display='block';
 }
-// show first tab by default
-showTab('dnd');
 
 // ------------------ SUPABASE ------------------
 const supabase = window.supabase.createClient(
@@ -132,61 +130,60 @@ let user = null;
 
 // AUTH
 async function signup(){
-await supabase.auth.signUp({email: email.value,password: password.value});
-alert("Signed up!");
+  await supabase.auth.signUp({email: email.value,password: password.value});
+  alert("Signed up!");
 }
 async function login(){
-let { data } = await supabase.auth.signInWithPassword({email: email.value,password: password.value});
-user = data.user;
-status.innerText = "Logged in as "+user.email;
+  let { data } = await supabase.auth.signInWithPassword({email: email.value,password: password.value});
+  user = data.user;
+  status.innerText = "Logged in as "+user.email;
 }
 async function logout(){
-await supabase.auth.signOut();
-user=null;
-status.innerText="Logged out";
+  await supabase.auth.signOut();
+  user=null;
+  status.innerText="Logged out";
 }
 
 // IMAGE UPLOAD
 async function upload(file,path){
-const { error } = await supabase.storage.from('images').upload(path,file);
-if(error){alert(error.message); return null;}
-return supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
+  const { error } = await supabase.storage.from('images').upload(path,file);
+  if(error){alert(error.message); return null;}
+  return supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
 }
 
 // ------------------ D&D CHARACTER ------------------
 async function saveChar(){
-if(!user){alert("Login first");return;}
-let file = charImage.files[0]; if(!file){alert("Pick image"); return;}
-let url = await upload(file,user.id+"/char_"+file.name);
-await supabase.from("characters").insert({user_id:user.id,name:charName.value,image:url});
-alert("Character saved!");
+  if(!user){alert("Login first");return;}
+  let file = charImage.files[0]; if(!file){alert("Pick image"); return;}
+  let url = await upload(file,user.id+"/char_"+file.name);
+  await supabase.from("characters").insert({user_id:user.id,name:charName.value,image:url});
+  alert("Character saved!");
 }
 async function loadChars(){
-if(!user){alert("Login first");return;}
-charList.innerHTML="";
-let { data } = await supabase.from("characters").select("*").eq("user_id",user.id);
-data.forEach(c=>{
-charList.innerHTML+=`<div><h3>${c.name}</h3><img src="${c.image}"></div>`;
-});
+  if(!user){alert("Login first");return;}
+  charList.innerHTML="";
+  let { data } = await supabase.from("characters").select("*").eq("user_id",user.id);
+  data.forEach(c=>{
+    charList.innerHTML+=`<div><h3>${c.name}</h3><img src="${c.image}"></div>`;
+  });
 }
 async function printSheet(){
-html2canvas(charList).then(canvas=>{
-let win = window.open();
-win.document.body.appendChild(canvas);
-});
+  html2canvas(charList).then(canvas=>{
+    let win = window.open();
+    win.document.body.appendChild(canvas);
+  });
 }
 
 // ------------------ DICE ROLLER ------------------
 function rollDice(){
-let val=dice.value.split('d');
-let num=parseInt(val[0]), sides=parseInt(val[1]);
-if(!num || !sides){diceResult.innerText="Invalid"; return;}
-let result=0;
-let rolls=[];
-for(let i=0;i<num;i++){let r=Math.floor(Math.random()*sides)+1;rolls.push(r); result+=r;}
-diceResult.innerText=`Rolls: ${rolls.join(', ')} → Total: ${result}`;
+  let val=dice.value.split('d');
+  let num=parseInt(val[0]), sides=parseInt(val[1]);
+  if(!num || !sides){diceResult.innerText="Invalid"; return;}
+  let result=0; let rolls=[];
+  for(let i=0;i<num;i++){let r=Math.floor(Math.random()*sides)+1;rolls.push(r); result+=r;}
+  diceResult.innerText=`Rolls: ${rolls.join(', ')} → Total: ${result}`;
 }
-</script>
 
+</script>
 </body>
 </html>
