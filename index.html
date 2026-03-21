@@ -2,10 +2,8 @@
 <html>
 <head>
 <title>Ultimate Portal</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Roboto&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 body{margin:0;font-family:Roboto;background:#0d0d15;color:white;}
 header{background:linear-gradient(90deg,#5a2aa6,#8b3fff);padding:20px;text-align:center;font-family:Cinzel;font-size:32px;}
@@ -33,195 +31,205 @@ h2{margin-top:0;}
 
 <!-- D&D TAB -->
 <div id="dnd" class="tab" style="display:block">
+  <div class="card">
+    <h2>Account</h2>
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <br>
+    <button onclick="signup()">Sign Up</button>
+    <button onclick="login()">Login</button>
+    <button onclick="logout()">Logout</button>
+    <p id="status"></p>
+  </div>
 
-<div class="card">
-<h2>Account</h2>
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-<br>
-<button onclick="signup()">Sign Up</button>
-<button onclick="login()">Login</button>
-<button onclick="logout()">Logout</button>
-<p id="status"></p>
-</div>
+  <div class="card">
+    <h2>Dice Roller 🎲</h2>
+    <input id="dice" placeholder="e.g. 2d6+1d20">
+    <button onclick="rollDice()">Roll</button>
+    <p id="diceResult"></p>
+  </div>
 
-<div class="card">
-<h2>Dice Roller 🎲</h2>
-<input id="dice" placeholder="e.g. 2d6+1d20">
-<button onclick="rollDice()">Roll</button>
-<p id="diceResult"></p>
-</div>
-
-<div class="card">
-<h2>Character Sheets Mini-Shop</h2>
-<div class="shop-item">
-<span>Random Character Sheet ($0.10)</span>
-<button onclick="orderItem('Random Character Sheet',0.10)">Order</button>
-</div>
-<div class="shop-item">
-<span>Starter Pack ($0.50)</span>
-<input id="charQty" type="number" value="1" min="1">
-<button onclick="orderItem('Starter Pack',0.50,document.getElementById('charQty').value)">Order</button>
-</div>
-</div>
-
+  <div class="card">
+    <h2>Character Sheets Mini-Shop</h2>
+    <div class="shop-item">
+      <span>Random Character Sheet ($0.10)</span>
+      <button onclick="orderItem('Random Character Sheet',0.10)">Order</button>
+    </div>
+    <div class="shop-item">
+      <span>Starter Pack ($0.50)</span>
+      <input id="charQty" type="number" value="1" min="1">
+      <button onclick="orderItem('Starter Pack',0.50,document.getElementById('charQty').value)">Order</button>
+    </div>
+  </div>
 </div>
 
 <!-- GD TAB -->
 <div id="gd" class="tab">
-<div class="card">
-<h2>Custom Icons / Tutorial Packs</h2>
-<div class="shop-item">
-<span>Custom Icon Pack ($1.00)</span>
-<input id="gdQty" type="number" value="1" min="1">
-<button onclick="orderItem('Custom Icon Pack',1,document.getElementById('gdQty').value)">Order</button>
-</div>
-<div class="shop-item">
-<span>Tutorial Pack ($1.00)</span>
-<input id="gdTutQty" type="number" value="1" min="1">
-<button onclick="orderItem('Tutorial Pack',1,document.getElementById('gdTutQty').value)">Order</button>
-</div>
-</div>
-<div class="card">
-<h2>Level Ideas Generator</h2>
-<button onclick="generateLevelIdea()">Generate Idea</button>
-<p id="levelIdea"></p>
-</div>
+  <div class="card">
+    <h2>Custom Icons / Tutorial Packs</h2>
+    <div class="shop-item">
+      <span>Custom Icon Pack ($1.00)</span>
+      <input id="gdQty" type="number" value="1" min="1">
+      <button onclick="orderItem('Custom Icon Pack',1,document.getElementById('gdQty').value)">Order</button>
+    </div>
+    <div class="shop-item">
+      <span>Tutorial Pack ($1.00)</span>
+      <input id="gdTutQty" type="number" value="1" min="1">
+      <button onclick="orderItem('Tutorial Pack',1,document.getElementById('gdTutQty').value)">Order</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Level Ideas Generator</h2>
+    <button onclick="generateLevelIdea()">Generate Idea</button>
+    <p id="levelIdea"></p>
+  </div>
 </div>
 
 <!-- ONLINE TAB -->
 <div id="online" class="tab">
-<div class="card">
-<h2>Website Templates Mini-Shop ($1.20)</h2>
-<div class="shop-item">
-<span>Website Template</span>
-<input id="webQty" type="number" value="1" min="1">
-<button onclick="orderItem('Website Template',1.20,document.getElementById('webQty').value)">Order</button>
-</div>
-</div>
+  <div class="card">
+    <h2>Website Templates Mini-Shop ($1.20)</h2>
+    <div class="shop-item">
+      <span>Website Template</span>
+      <input id="webQty" type="number" value="1" min="1">
+      <button onclick="orderItem('Website Template',1.20,document.getElementById('webQty').value)">Order</button>
+    </div>
+  </div>
 </div>
 
 <!-- JOKES TAB -->
 <div id="jokes" class="tab">
-<div class="card">
-<h2>Memes</h2>
-<div id="memesGallery"></div>
-</div>
-<div class="card">
-<h2>Jokes</h2>
-<textarea id="jokeBox" rows="5" placeholder="Write or view jokes here..."></textarea>
-</div>
+  <div class="card">
+    <h2>Memes</h2>
+    <div id="memesGallery"></div>
+  </div>
+  <div class="card">
+    <h2>Jokes</h2>
+    <textarea id="jokeBox" rows="5" placeholder="Write or view jokes here..."></textarea>
+  </div>
 </div>
 
 <script>
+// 1. Move showTab to the very top so it's globally available immediately
+function showTab(tabId) {
+  document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
+  const target = document.getElementById(tabId);
+  if (target) target.style.display = 'block';
+}
+
 // ------------------ GLOBAL ------------------
-let user=null;
-const webhookURL="https://discord.com/api/webhooks/1465496912974315694/SVKa3SxLA-o4sZbddUsWIS-6udSkopEIgd5t3XS7azC0pd5xPze8Bbhf_Jbp6IkWt-Z2";
+let user = null;
+const webhookURL = "https://discord.com/api/webhooks/1465496912974315694/SVKa3SxLA-o4sZbddUsWIS-6udSkopEIgd5t3XS7azC0pd5xPze8Bbhf_Jbp6IkWt-Z2";
+
+// Initialize Supabase (Ensure your keys are correct)
 const supabase = window.supabase.createClient(
   "https://eyddfsvjmmalmfwpxruq.supabase.co",
   "sb_publishable_fXIjILfuLAz05m8xglPw7w_ATTFG_X0"
 );
 
-function showTab(tabId){
-  document.querySelectorAll('.tab').forEach(t=>t.style.display='none');
-  document.getElementById(tabId).style.display='block';
-}
-
-// ------------------ ONLOAD ------------------
-window.onload = function(){
+window.onload = function() {
+  // Set default tab
   showTab('dnd');
 
-  // grab inputs
-  const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password');
   const statusDisplay = document.getElementById('status');
-  const diceInput = document.getElementById('dice');
-  const diceResultDisplay = document.getElementById('diceResult');
 
-  // AUTH FUNCTIONS
-  window.signup = async function(){
-    await supabase.auth.signUp({email: emailInput.value, password: passwordInput.value});
-    alert("Signed up!");
-  }
-  window.login = async function(){
-    let { data, error } = await supabase.auth.signInWithPassword({email: emailInput.value, password: passwordInput.value});
-    if(error){ alert(error.message); return; }
+  // AUTH FUNCTIONS - Attached to window so buttons can find them
+  window.signup = async function() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) alert(error.message);
+    else alert("Check your email for confirmation!");
+  };
+
+  window.login = async function() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    let { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) { alert(error.message); return; }
     user = data.user;
-    statusDisplay.innerText = "Logged in as "+user.email;
-  }
-  window.logout = async function(){
+    statusDisplay.innerText = "Logged in as " + user.email;
+  };
+
+  window.logout = async function() {
     await supabase.auth.signOut();
-    user=null;
-    statusDisplay.innerText="Logged out";
-  }
+    user = null;
+    statusDisplay.innerText = "Logged out";
+  };
 
   // DICE ROLLER
-  window.rollDice = function(){
-    let val = diceInput.value.split('+');
-    let total=0;
-    let rolls=[];
-    for(let v of val){
-      let parts = v.split('d');
+  window.rollDice = function() {
+    const diceInput = document.getElementById('dice').value;
+    let val = diceInput.split('+');
+    let total = 0;
+    let rolls = [];
+    for (let v of val) {
+      let parts = v.trim().split('d');
       let n = parseInt(parts[0]), sides = parseInt(parts[1]);
-      if(!n||!sides) continue;
-      for(let i=0;i<n;i++){let r=Math.floor(Math.random()*sides)+1; rolls.push(r); total+=r;}
+      if (isNaN(n) || isNaN(sides)) continue;
+      for (let i = 0; i < n; i++) {
+        let r = Math.floor(Math.random() * sides) + 1;
+        rolls.push(r);
+        total += r;
+      }
     }
-    diceResultDisplay.innerText=`Rolls: ${rolls.join(', ')} → Total: ${total}`;
-  }
+    document.getElementById('diceResult').innerText = `Rolls: ${rolls.join(', ')} → Total: ${total}`;
+  };
 
   // MINI SHOP / WEBHOOK
-  window.orderItem = function(item, price, qty=1){
+  window.orderItem = function(item, price, qty = 1) {
     let name = prompt("Enter your name:");
     let address = prompt("Enter your address:");
-    if(!name||!address) return;
-    let total = (price*qty).toFixed(2);
-    fetch(webhookURL,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
+    if (!name || !address) return;
+    let total = (price * qty).toFixed(2);
+    
+    fetch(webhookURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        content:`New Order!\nItem: ${item}\nQuantity: ${qty}\nPrice: $${price}\nTotal: $${total}\nName: ${name}\nAddress: ${address}`
+        content: `**New Order!**\n**Item:** ${item}\n**Qty:** ${qty}\n**Total:** $${total}\n**Name:** ${name}\n**Address:** ${address}`
       })
     });
     alert(`Ordered ${qty} x ${item} for $${total}!`);
-  }
+  };
 
   // LEVEL IDEA
-  window.generateLevelIdea = function(){
+  window.generateLevelIdea = function() {
     const ideas = [
-      "Spinning saws and lava pits","Underwater maze with currents","Invisible platforms puzzle",
-      "Gravity reverse section","Monster gauntlet with timed spikes","Music-sync obstacle course"
+      "Spinning saws and lava pits", "Underwater maze with currents", "Invisible platforms puzzle",
+      "Gravity reverse section", "Monster gauntlet with timed spikes", "Music-sync obstacle course"
     ];
-    document.getElementById('levelIdea').innerText=ideas[Math.floor(Math.random()*ideas.length)];
-  }
+    document.getElementById('levelIdea').innerText = ideas[Math.floor(Math.random() * ideas.length)];
+  };
 
   // MEMES
-  window.loadMemes = function(){
-    let images=[
-      "https://raw.githubusercontent.com/yourusername/yourrepo/main/meme1.png",
-      "https://raw.githubusercontent.com/yourusername/yourrepo/main/meme2.png",
-      "https://raw.githubusercontent.com/yourusername/yourrepo/main/meme3.png"
+  window.loadMemes = function() {
+    let images = [
+      "https://via.placeholder.com",
+      "https://via.placeholder.com"
     ];
-    let container=document.getElementById("memesGallery");
-    container.innerHTML="";
-    images.forEach(url=>{
-      let div=document.createElement("div");
-      div.className="shop-item";
-      div.innerHTML=`<img src="${url}"><button onclick="downloadImage('${url}')">Download</button>`;
+    let container = document.getElementById("memesGallery");
+    container.innerHTML = "";
+    images.forEach(url => {
+      let div = document.createElement("div");
+      div.className = "shop-item";
+      div.innerHTML = `<img src="${url}"><button onclick="downloadImage('${url}')">Download</button>`;
       container.appendChild(div);
     });
-  }
+  };
 
-  window.downloadImage = function(url){
-    let a=document.createElement("a");
-    a.href=url;
-    a.download=url.split("/").pop();
+  window.downloadImage = function(url) {
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "meme.png";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-  }
+  };
 
   loadMemes();
 };
 </script>
+
 </body>
 </html>
