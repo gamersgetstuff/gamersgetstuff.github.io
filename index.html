@@ -1,214 +1,191 @@
 <!DOCTYPE html>
 <html>
 <head>
-
-<title>D&D Central</title>
+<title>Ultimate Portal</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Roboto&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 <style>
-body{margin:0;background:#0f0f17;color:white;font-family:Roboto;}
+body{margin:0;font-family:Roboto;background:#0d0d15;color:white;}
 header{background:linear-gradient(90deg,#5a2aa6,#8b3fff);padding:20px;text-align:center;font-family:Cinzel;font-size:32px;}
-.card{background:#1b1b29;padding:20px;margin:20px;border-radius:10px;}
-button{background:#8b3fff;border:none;padding:10px;color:white;border-radius:8px;cursor:pointer;}
-input,textarea{padding:8px;margin:5px;border-radius:6px;border:none;}
-img{max-width:120px;border-radius:8px;margin-top:10px;}
+nav{display:flex;justify-content:center;background:#1b1b29;}
+nav button{background:none;color:white;border:none;padding:15px 20px;cursor:pointer;font-size:16px;}
+nav button:hover{background:#3a3a60;border-radius:6px;}
+.tab{display:none;padding:20px;}
+.card{background:#1a1a2b;padding:20px;margin:15px;border-radius:10px;}
+input,textarea,select,button{padding:8px;margin:5px;border-radius:6px;border:none;}
+img{max-width:150px;border-radius:10px;margin-top:10px;}
+h2{margin-top:0;}
 </style>
-
 </head>
-
 <body>
 
-<header>D&D CENTRAL 🐉</header>
+<header>ULTIMATE PORTAL 🐉🚀</header>
+
+<nav>
+<button onclick="showTab('dnd')">D&D</button>
+<button onclick="showTab('gd')">Geometry Dash</button>
+<button onclick="showTab('online')">Online Stuff</button>
+<button onclick="showTab('jokes')">Jokes</button>
+</nav>
+
+<!-- D&D TAB -->
+<div id="dnd" class="tab">
 
 <div class="card">
-
 <h2>Account</h2>
-
 <input id="email" placeholder="Email">
 <input id="password" type="password" placeholder="Password">
-
 <br>
-
 <button onclick="signup()">Sign Up</button>
 <button onclick="login()">Login</button>
 <button onclick="logout()">Logout</button>
-
 <p id="status"></p>
-
 </div>
 
 <div class="card">
-
-<h2>Character Creator</h2>
-
+<h2>Character Creator / Sheets</h2>
 <input id="charName" placeholder="Character Name">
 <input type="file" id="charImage">
-
 <br>
-
 <button onclick="saveChar()">Save Character</button>
 <button onclick="loadChars()">Load Characters</button>
-
+<button onclick="printSheet()">Print Sheet</button>
 <div id="charList"></div>
-
 </div>
 
 <div class="card">
+<h2>Dice Roller 🎲</h2>
+<input id="dice" placeholder="e.g. 1d20">
+<button onclick="rollDice()">Roll</button>
+<p id="diceResult"></p>
+</div>
 
-<h2>Campaign Creator</h2>
+<div class="card">
+<h2>Starter Packs for DM</h2>
+<p>Placeholder for DM starter packs content.</p>
+</div>
 
-<input id="campName" placeholder="Campaign Name">
-<textarea id="campNotes" placeholder="Notes"></textarea>
-<input type="file" id="campImage">
+</div>
 
-<br>
+<!-- GD TAB -->
+<div id="gd" class="tab">
+<div class="card">
+<h2>Custom Geometry</h2>
+<p>Placeholder for GD custom geometry tools.</p>
+</div>
+<div class="card">
+<h2>Dash Icons</h2>
+<p>Placeholder for GD icons.</p>
+</div>
+<div class="card">
+<h2>Level Ideas</h2>
+<p>Placeholder for level ideas.</p>
+</div>
+<div class="card">
+<h2>Tutorial Packs</h2>
+<p>Placeholder for tutorial packs.</p>
+</div>
+</div>
 
-<button onclick="saveCamp()">Save Campaign</button>
-<button onclick="loadCamps()">Load Campaigns</button>
+<!-- ONLINE TAB -->
+<div id="online" class="tab">
+<div class="card">
+<h2>Profile Banners</h2>
+<p>Placeholder for YouTube/Discord banners.</p>
+</div>
+<div class="card">
+<h2>Website Templates</h2>
+<p>Placeholder for templates.</p>
+</div>
+</div>
 
-<div id="campList"></div>
-
+<!-- JOKES TAB -->
+<div id="jokes" class="tab">
+<div class="card">
+<h2>Printable Memes</h2>
+<p>Placeholder for printable memes.</p>
+</div>
+<div class="card">
+<h2>Jokes</h2>
+<p>Placeholder for jokes.</p>
+</div>
 </div>
 
 <script>
+// ------------------ TAB NAVIGATION ------------------
+function showTab(tabId){
+document.querySelectorAll('.tab').forEach(t=>t.style.display='none');
+document.getElementById(tabId).style.display='block';
+}
+// show first tab by default
+showTab('dnd');
 
+// ------------------ SUPABASE ------------------
 const supabase = window.supabase.createClient(
-"https://eyddfsvjmmalmfwpxruq.supabase.co",
-"sb_publishable_fXIjILfuLAz05m8xglPw7w_ATTFG_X0"
-)
-
-let user = null
+"YOUR_URL",
+"YOUR_KEY"
+);
+let user = null;
 
 // AUTH
-
 async function signup(){
-await supabase.auth.signUp({
-email: email.value,
-password: password.value
-})
-alert("Signed up!")
+await supabase.auth.signUp({email: email.value,password: password.value});
+alert("Signed up!");
 }
-
 async function login(){
-let { data } = await supabase.auth.signInWithPassword({
-email: email.value,
-password: password.value
-})
-user = data.user
-status.innerText = "Logged in as " + user.email
+let { data } = await supabase.auth.signInWithPassword({email: email.value,password: password.value});
+user = data.user;
+status.innerText = "Logged in as "+user.email;
 }
-
 async function logout(){
-await supabase.auth.signOut()
-user = null
-status.innerText = "Logged out"
+await supabase.auth.signOut();
+user=null;
+status.innerText="Logged out";
 }
 
 // IMAGE UPLOAD
-
-async function upload(file, path){
-const { error } = await supabase.storage
-.from('images')
-.upload(path, file)
-
-if(error){
-alert(error.message)
-return null
+async function upload(file,path){
+const { error } = await supabase.storage.from('images').upload(path,file);
+if(error){alert(error.message); return null;}
+return supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
 }
 
-return supabase.storage
-.from('images')
-.getPublicUrl(path).data.publicUrl
-}
-
-// CHARACTER
-
+// ------------------ D&D CHARACTER ------------------
 async function saveChar(){
-
-if(!user){alert("Login first");return}
-
-let file = charImage.files[0]
-if(!file){alert("Pick image");return}
-
-let url = await upload(file, user.id + "/char_" + file.name)
-
-await supabase.from("characters").insert({
-user_id: user.id,
-name: charName.value,
-image: url
-})
-
-alert("Character saved!")
+if(!user){alert("Login first");return;}
+let file = charImage.files[0]; if(!file){alert("Pick image"); return;}
+let url = await upload(file,user.id+"/char_"+file.name);
+await supabase.from("characters").insert({user_id:user.id,name:charName.value,image:url});
+alert("Character saved!");
 }
-
 async function loadChars(){
-
-if(!user){alert("Login first");return}
-
-charList.innerHTML=""
-
-let { data } = await supabase
-.from("characters")
-.select("*")
-.eq("user_id", user.id)
-
+if(!user){alert("Login first");return;}
+charList.innerHTML="";
+let { data } = await supabase.from("characters").select("*").eq("user_id",user.id);
 data.forEach(c=>{
-charList.innerHTML += `
-<div>
-<h3>${c.name}</h3>
-<img src="${c.image}">
-</div>
-`
-})
-
+charList.innerHTML+=`<div><h3>${c.name}</h3><img src="${c.image}"></div>`;
+});
+}
+async function printSheet(){
+html2canvas(charList).then(canvas=>{
+let win = window.open();
+win.document.body.appendChild(canvas);
+});
 }
 
-// CAMPAIGNS
-
-async function saveCamp(){
-
-if(!user){alert("Login first");return}
-
-let file = campImage.files[0]
-if(!file){alert("Pick image");return}
-
-let url = await upload(file, user.id + "/camp_" + file.name)
-
-await supabase.from("campaigns").insert({
-user_id: user.id,
-name: campName.value,
-notes: campNotes.value,
-image: url
-})
-
-alert("Campaign saved!")
+// ------------------ DICE ROLLER ------------------
+function rollDice(){
+let val=dice.value.split('d');
+let num=parseInt(val[0]), sides=parseInt(val[1]);
+if(!num || !sides){diceResult.innerText="Invalid"; return;}
+let result=0;
+let rolls=[];
+for(let i=0;i<num;i++){let r=Math.floor(Math.random()*sides)+1;rolls.push(r); result+=r;}
+diceResult.innerText=`Rolls: ${rolls.join(', ')} → Total: ${result}`;
 }
-
-async function loadCamps(){
-
-if(!user){alert("Login first");return}
-
-campList.innerHTML=""
-
-let { data } = await supabase
-.from("campaigns")
-.select("*")
-.eq("user_id", user.id)
-
-data.forEach(c=>{
-campList.innerHTML += `
-<div>
-<h3>${c.name}</h3>
-<p>${c.notes}</p>
-<img src="${c.image}">
-</div>
-`
-})
-
-}
-
 </script>
 
 </body>
