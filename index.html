@@ -114,106 +114,114 @@ h2{margin-top:0;}
 </div>
 
 <script>
-// ------------------ TAB NAV ------------------
-function showTab(tabId){
-document.querySelectorAll('.tab').forEach(t=>t.style.display='none');
-document.getElementById(tabId).style.display='block';
-}
-window.onload=function(){showTab('dnd'); loadMemes();};
-
-// ------------------ SUPABASE ------------------
-const supabase = window.supabase.createClient(
-"https://eyddfsvjmmalmfwpxruq.supabase.co",
-"sb_publishable_fXIjILfuLAz05m8xglPw7w_ATTFG_X0"
-);
+// ------------------ GLOBAL ------------------
 let user=null;
-
-// grab inputs
-const emailInput=document.getElementById('email');
-const passwordInput=document.getElementById('password');
-const statusDisplay=document.getElementById('status');
-
-// AUTH
-async function signup(){
-await supabase.auth.signUp({email:emailInput.value,password:passwordInput.value});
-alert("Signed up!");
-}
-async function login(){
-let { data, error }=await supabase.auth.signInWithPassword({email:emailInput.value,password:passwordInput.value});
-if(error){alert(error.message);return;}
-user=data.user;
-statusDisplay.innerText="Logged in as "+user.email;
-}
-async function logout(){
-await supabase.auth.signOut();
-user=null;
-statusDisplay.innerText="Logged out";
-}
-
-// ------------------ DICE ROLLER ------------------
-function rollDice(){
-let val=dice.value.split('+');
-let total=0;
-let rolls=[];
-for(let v of val){
-let parts=v.split('d');
-let n=parseInt(parts[0]), sides=parseInt(parts[1]);
-for(let i=0;i<n;i++){let r=Math.floor(Math.random()*sides)+1;rolls.push(r); total+=r;}
-}
-diceResult.innerText=`Rolls: ${rolls.join(', ')} → Total: ${total}`;
-}
-
-// ------------------ MINI SHOP / WEBHOOK ------------------
 const webhookURL="https://discord.com/api/webhooks/1465496912974315694/SVKa3SxLA-o4sZbddUsWIS-6udSkopEIgd5t3XS7azC0pd5xPze8Bbhf_Jbp6IkWt-Z2";
+const supabase = window.supabase.createClient(
+  "https://eyddfsvjmmalmfwpxruq.supabase.co",
+  "sb_publishable_fXIjILfuLAz05m8xglPw7w_ATTFG_X0"
+);
 
-function orderItem(item,price,qty=1){
-let name=prompt("Enter your name:");
-let address=prompt("Enter your address:");
-if(!name||!address)return;
-let total=(price*qty).toFixed(2);
-fetch(webhookURL,{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-content:`New Order!\nItem: ${item}\nQuantity: ${qty}\nPrice: $${price}\nTotal: $${total}\nName: ${name}\nAddress: ${address}`
-})
-});
-alert(`Ordered ${qty} x ${item} for $${total}!`);
+function showTab(tabId){
+  document.querySelectorAll('.tab').forEach(t=>t.style.display='none');
+  document.getElementById(tabId).style.display='block';
 }
 
-// ------------------ LEVEL IDEA ------------------
-function generateLevelIdea(){
-const ideas=[
-"Spinning saws and lava pits","Underwater maze with currents","Invisible platforms puzzle",
-"Gravity reverse section","Monster gauntlet with timed spikes","Music-sync obstacle course"
-];
-let idx=Math.floor(Math.random()*ideas.length);
-levelIdea.innerText=ideas[idx];
-}
+// ------------------ ONLOAD ------------------
+window.onload = function(){
+  showTab('dnd');
 
-// ------------------ MEMES GALLERY ------------------
-function loadMemes(){
-let images=[
-"https://raw.githubusercontent.com/gamersgetstuff/gamersgetstuff.github.io/mail/meme.png",
-"https://raw.githubusercontent.com/gamersgetstuff/gamersgetstuff.github.io/main/meme2.png",
-"https://raw.githubusercontent.com/gamersgetstuff/gamersgetstuff.github.io/main/meme3.png"
-]; // add up to 15-20 images
-let container=document.getElementById("memesGallery");
-images.forEach(url=>{
-let div=document.createElement("div");
-div.className="shop-item";
-div.innerHTML=`<img src="${url}"><button onclick="downloadImage('${url}')">Download</button>`;
-container.appendChild(div);
-});
-}
-function downloadImage(url){
-let a=document.createElement("a");
-a.href=url;
-a.download=url.split("/").pop();
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-}
+  // grab inputs
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const statusDisplay = document.getElementById('status');
+  const diceInput = document.getElementById('dice');
+  const diceResultDisplay = document.getElementById('diceResult');
+
+  // AUTH FUNCTIONS
+  window.signup = async function(){
+    await supabase.auth.signUp({email: emailInput.value, password: passwordInput.value});
+    alert("Signed up!");
+  }
+  window.login = async function(){
+    let { data, error } = await supabase.auth.signInWithPassword({email: emailInput.value, password: passwordInput.value});
+    if(error){ alert(error.message); return; }
+    user = data.user;
+    statusDisplay.innerText = "Logged in as "+user.email;
+  }
+  window.logout = async function(){
+    await supabase.auth.signOut();
+    user=null;
+    statusDisplay.innerText="Logged out";
+  }
+
+  // DICE ROLLER
+  window.rollDice = function(){
+    let val = diceInput.value.split('+');
+    let total=0;
+    let rolls=[];
+    for(let v of val){
+      let parts = v.split('d');
+      let n = parseInt(parts[0]), sides = parseInt(parts[1]);
+      if(!n||!sides) continue;
+      for(let i=0;i<n;i++){let r=Math.floor(Math.random()*sides)+1; rolls.push(r); total+=r;}
+    }
+    diceResultDisplay.innerText=`Rolls: ${rolls.join(', ')} → Total: ${total}`;
+  }
+
+  // MINI SHOP / WEBHOOK
+  window.orderItem = function(item, price, qty=1){
+    let name = prompt("Enter your name:");
+    let address = prompt("Enter your address:");
+    if(!name||!address) return;
+    let total = (price*qty).toFixed(2);
+    fetch(webhookURL,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        content:`New Order!\nItem: ${item}\nQuantity: ${qty}\nPrice: $${price}\nTotal: $${total}\nName: ${name}\nAddress: ${address}`
+      })
+    });
+    alert(`Ordered ${qty} x ${item} for $${total}!`);
+  }
+
+  // LEVEL IDEA
+  window.generateLevelIdea = function(){
+    const ideas = [
+      "Spinning saws and lava pits","Underwater maze with currents","Invisible platforms puzzle",
+      "Gravity reverse section","Monster gauntlet with timed spikes","Music-sync obstacle course"
+    ];
+    document.getElementById('levelIdea').innerText=ideas[Math.floor(Math.random()*ideas.length)];
+  }
+
+  // MEMES
+  window.loadMemes = function(){
+    let images=[
+      "https://raw.githubusercontent.com/yourusername/yourrepo/main/meme1.png",
+      "https://raw.githubusercontent.com/yourusername/yourrepo/main/meme2.png",
+      "https://raw.githubusercontent.com/yourusername/yourrepo/main/meme3.png"
+    ];
+    let container=document.getElementById("memesGallery");
+    container.innerHTML="";
+    images.forEach(url=>{
+      let div=document.createElement("div");
+      div.className="shop-item";
+      div.innerHTML=`<img src="${url}"><button onclick="downloadImage('${url}')">Download</button>`;
+      container.appendChild(div);
+    });
+  }
+
+  window.downloadImage = function(url){
+    let a=document.createElement("a");
+    a.href=url;
+    a.download=url.split("/").pop();
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  loadMemes();
+};
 </script>
 </body>
 </html>
