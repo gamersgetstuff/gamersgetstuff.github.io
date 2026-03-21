@@ -61,7 +61,7 @@ h2{margin-top:0;}
 <div class="shop-item">
 <span>Starter Pack ($0.50)</span>
 <input id="charQty" type="number" value="1" min="1">
-<button onclick="orderItem('Starter Pack',0.50,charQty.value)">Order</button>
+<button onclick="orderItem('Starter Pack',0.50,document.getElementById('charQty').value)">Order</button>
 </div>
 </div>
 
@@ -74,12 +74,12 @@ h2{margin-top:0;}
 <div class="shop-item">
 <span>Custom Icon Pack ($1.00)</span>
 <input id="gdQty" type="number" value="1" min="1">
-<button onclick="orderItem('Custom Icon Pack',1,gdQty.value)">Order</button>
+<button onclick="orderItem('Custom Icon Pack',1,document.getElementById('gdQty').value)">Order</button>
 </div>
 <div class="shop-item">
 <span>Tutorial Pack ($1.00)</span>
 <input id="gdTutQty" type="number" value="1" min="1">
-<button onclick="orderItem('Tutorial Pack',1,gdTutQty.value)">Order</button>
+<button onclick="orderItem('Tutorial Pack',1,document.getElementById('gdTutQty').value)">Order</button>
 </div>
 </div>
 <div class="card">
@@ -96,7 +96,7 @@ h2{margin-top:0;}
 <div class="shop-item">
 <span>Website Template</span>
 <input id="webQty" type="number" value="1" min="1">
-<button onclick="orderItem('Website Template',1.2,webQty.value)">Order</button>
+<button onclick="orderItem('Website Template',1.20,document.getElementById('webQty').value)">Order</button>
 </div>
 </div>
 </div>
@@ -114,7 +114,7 @@ h2{margin-top:0;}
 </div>
 
 <script>
-// ------------------ TAB NAVIGATION ------------------
+// ------------------ TAB NAV ------------------
 function showTab(tabId){
 document.querySelectorAll('.tab').forEach(t=>t.style.display='none');
 document.getElementById(tabId).style.display='block';
@@ -128,20 +128,26 @@ const supabase = window.supabase.createClient(
 );
 let user=null;
 
+// grab inputs
+const emailInput=document.getElementById('email');
+const passwordInput=document.getElementById('password');
+const statusDisplay=document.getElementById('status');
+
 // AUTH
 async function signup(){
-await supabase.auth.signUp({email:email.value,password:password.value});
+await supabase.auth.signUp({email:emailInput.value,password:passwordInput.value});
 alert("Signed up!");
 }
 async function login(){
-let { data } = await supabase.auth.signInWithPassword({email:email.value,password:password.value});
+let { data, error }=await supabase.auth.signInWithPassword({email:emailInput.value,password:passwordInput.value});
+if(error){alert(error.message);return;}
 user=data.user;
-status.innerText="Logged in as "+user.email;
+statusDisplay.innerText="Logged in as "+user.email;
 }
 async function logout(){
 await supabase.auth.signOut();
 user=null;
-status.innerText="Logged out";
+statusDisplay.innerText="Logged out";
 }
 
 // ------------------ DICE ROLLER ------------------
@@ -191,7 +197,7 @@ let images=[
 "https://raw.githubusercontent.com/yourusername/yourrepo/main/meme1.png",
 "https://raw.githubusercontent.com/yourusername/yourrepo/main/meme2.png",
 "https://raw.githubusercontent.com/yourusername/yourrepo/main/meme3.png"
-]; // add up to 15-20
+]; // add up to 15-20 images
 let container=document.getElementById("memesGallery");
 images.forEach(url=>{
 let div=document.createElement("div");
@@ -208,7 +214,6 @@ document.body.appendChild(a);
 a.click();
 document.body.removeChild(a);
 }
-
 </script>
 </body>
 </html>
